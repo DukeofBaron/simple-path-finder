@@ -37,49 +37,49 @@ def draw_labirent(maze):
     
     pygame.display.flip()
 
-def etrafi_bul(maze, satır, sütun):
+def check_around(maze, row, column):
     etraf = []
     try:
-        etraf.append(maze[satır][sütun+1])
+        etraf.append(maze[row][column+1])
     except:
         etraf.append(-1)
     try:
-        if sütun-1 < 0:
+        if column-1 < 0:
             etraf.append(-1)
         else:
-            etraf.append(maze[satır][sütun-1])
+            etraf.append(maze[row][column-1])
     except:
         etraf.append(-1)
     try:
-        etraf.append(maze[satır+1][sütun])
+        etraf.append(maze[row+1][column])
     except:
         etraf.append(-1)
     try:
-        if satır-1 < 0:
+        if row-1 < 0:
             etraf.append(-1)
         else:
-            etraf.append(maze[satır-1][sütun])
+            etraf.append(maze[row-1][column])
     except:
         etraf.append(-1)
     
     return etraf
 
-def hareket(satır,sütun,index):
-    if index == 0:  # sağ
-        sütun += 1
-    elif index == 1:  # sol
-        sütun -= 1
-    elif index == 2:  # aşağı
-        satır += 1
-    else:  # yukarı
-        satır -= 1
-    return satır , sütun
+def movement(row,column,index):
+    if index == 0:  #right
+        column += 1
+    elif index == 1:  #left
+        column -= 1
+    elif index == 2:  #down
+        row += 1
+    else:  #up
+        row -= 1
+    return row , column
 font = pygame.font.Font(None, 70)
-text = font.render("ULAŞTINIZ",True,(255,0,0))
+text = font.render("Solvable",True,(255,0,0))
 
 running = True
-satır = 0
-sütun = 0
+row = 0
+column = 0
 
 
 maze = [[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -98,7 +98,7 @@ maze = [[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0],
     [0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0],
     [1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 0],
+    [0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1],
     [0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
     [1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0],
     [1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0]]
@@ -107,29 +107,29 @@ maze = [[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 while running:
     screen.fill(WHITE)
     draw_labirent(maze)
-    etraf = etrafi_bul(maze, satır, sütun)
+    etraf = check_around(maze, row, column)
     if 0 in etraf:
         index = etraf.index(0)
-        satır , sütun = hareket(satır,sütun,index)
-        maze[satır][sütun] = 2
+        row , column = movement(row,column,index)
+        maze[row][column] = 2
     elif 2 in etraf:
-        maze[satır][sütun] = 3
+        maze[row][column] = 3
         index = etraf.index(2)
-        satır , sütun = hareket(satır,sütun,index)
+        row , column = movement(row,column,index)
     else:
-        back = False #geri dönüş sıkıştığında
+        back = False #check any possible ways if it stucks
         for i in range(len(maze)):
             for j in range(len(maze[0])):
-                if (maze[i][j] == 2) and (0 in etrafi_bul(maze,i,j)):
-                    satır=i
-                    sütun=j
+                if (maze[i][j] == 2) and (0 in check_around(maze,i,j)):
+                    row=i
+                    column=j
                     back = True
-        if not back:  #geri dönemesse bitir
-            print(satır,sütun)
+        if not back:  #if not solvable end it
+            print(row,column)
             print("çzülemez")
             running = False
             break
-    if satır == len(maze)-1 and sütun == len(maze[0])-1: #bitiş kontrol
+    if row == len(maze)-1 and column == len(maze[0])-1: #finish check
         screen.blit(text,(HEIGHT/2,WIDTH/2))
         pygame.display.flip()
         print("Ulaştınız!")
